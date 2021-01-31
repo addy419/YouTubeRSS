@@ -1,0 +1,5 @@
+#!/bin/bash
+
+Output=${1:-"subscriptions.json"}
+
+cat $Output | grep -e channelId -e title | grep -v "$(cat $Output | grep -m1 -e channelId)" | awk '!seen[$0]++' | awk '{ $1=""; $2=""; print }' | awk -F '"' '{ print $2 }' | sed 'N;s/\n/ /' | awk 'BEGIN {print "<?xml version=\"1.0\"?><opml version=\"1.0\"><body><outline title=\"YouTube RSS\" text=\"YouTube RSS\">"} ; {  printf "<outline type=\"rss\" xmlUrl=\"https://www.youtube.com/feeds/videos.xml?channel_id=" $1 "\" htmlUrl=\"https://www.youtube.com/channel/" $1 "\" title=\"", $1=""; sub(/^[ \t]+/, ""); print $0 "\" text=\"" $0 "\" />"} ; END { print "</outline></body></opml>"}'
